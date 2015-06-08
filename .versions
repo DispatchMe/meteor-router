@@ -3,7 +3,7 @@ blaze@2.1.2
 blaze-tools@1.0.3
 check@1.0.5
 deps@1.0.7
-dispatch:router@0.0.1
+dispatch:router@0.0.2
 ejson@1.0.6
 geojson-utils@1.0.3
 html-tools@1.0.4
