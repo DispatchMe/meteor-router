@@ -96,14 +96,45 @@ var forceBack = false;
 Router.goBack = function (path) {
   if (!Router._enabled) return;
 
-  if (!path) return history.back();
+  history.back();
 
-  forceBack = true;
-  Router.go(path, true);
+  if (!path) return;
+
+  // Allow the history.back() to register in the browser then replace the state with the new route.
+  // Since route actions are debounced only the new route will be triggered.
+  Meteor.setTimeout(function () {
+    forceBack = true;
+    Router.go(path, true);
+  }, 10);
 };
 
 // The previous route index.
 var previousIndex = 0;
+
+// Debounce route actions so that we can manipulate the history with
+// Route.goBack without triggering a route action on the wrong route.
+var debouncedRouteAction = _.debounce(function (route, action, params) {
+  previousRouteVar.set(currentRouteVar.get());
+  currentRouteVar.set(route);
+
+  var index = Router._getIndex(params);
+  var goBack = forceBack || previousIndex > index;
+
+  // Omit the index from the parameters
+  // that is something we track privately.
+  params = _.omit(params, 'i');
+
+  // Call the route action
+  if (action) action(params, goBack);
+
+  Router._emitter.emit('change', route, params, goBack);
+
+  // Reset force back
+  forceBack = false;
+
+  // Store the previous route index.
+  previousIndex = index;
+}, 30);
 
 /**
  * Map routes to actions
@@ -120,26 +151,7 @@ Router.map = function (routeActions) {
   _.each(routeActions, function (action, route) {
     FlowRouter.route(route, {
       action: function (params) {
-        previousRouteVar.set(currentRouteVar.get());
-        currentRouteVar.set(route);
-
-        var index = Router._getIndex(params);
-        var goBack = forceBack || previousIndex > index;
-
-        // Omit the index from the parameters
-        // that is something we track privately.
-        params = _.omit(params, 'i');
-
-        // Call the route action
-        if (action) action(params, goBack);
-
-        Router._emitter.emit('change', route, params, goBack);
-
-        // Reset force back
-        forceBack = false;
-
-        // Store the previous route index.
-        previousIndex = index;
+        debouncedRouteAction(route, action, params);
       }
     });
   });
