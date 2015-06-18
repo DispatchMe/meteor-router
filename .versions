@@ -5,7 +5,7 @@ check@1.0.5
 coffeescript@1.0.6
 cosmos:browserify@0.3.0
 deps@1.0.7
-dispatch:router@0.0.3
+dispatch:router@0.0.4
 ejson@1.0.6
 geojson-utils@1.0.3
 html-tools@1.0.4
