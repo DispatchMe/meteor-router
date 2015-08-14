@@ -59,11 +59,7 @@ Router._getIndex = function (params) {
  * is the only way we can support the browser's back button.
  */
 Router.go = function (path, replaceState) {
-  if (!Router._enabled) return;
-
-  if (window.location.pathname === path) {
-    return Meteor._debug('Ignoring route change to the same route.');
-  }
+  if (!Router._enabled || window.location.pathname === path) return;
 
   // Update the page index so we can track which direction we are going
   var index = Router._getIndex();
