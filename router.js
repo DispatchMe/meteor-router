@@ -10,6 +10,32 @@ Router.once = Router._emitter.once.bind(Router._emitter);
 var currentRouteVar = new ReactiveVar();
 var previousRouteVar = new ReactiveVar();
 
+var getParams = function (str) {
+   var queryString = str || window.location.search || '';
+   var keyValPairs = [];
+
+   var params = {};
+
+   // There are no parameters on the route.
+   if (queryString.indexOf('?') === -1) return params;
+
+   queryString = queryString.substring(queryString.indexOf('?') + 1);
+
+   if (queryString.length) {
+      keyValPairs = queryString.split('&');
+
+      for (pairNum in keyValPairs) {
+        var key = keyValPairs[pairNum].split('=')[0];
+        if (!key.length) continue;
+        if (typeof params[key] === 'undefined')
+
+        params[key] = keyValPairs[pairNum].split('=')[1];
+      }
+   }
+
+   return params;
+};
+
 /**
  * The previous route path def.
  * @deprecated You cannot rely on this consistently.
@@ -61,15 +87,20 @@ Router._getIndex = function (params) {
 Router.go = function (path, replaceState) {
   if (!Router._enabled || window.location.pathname === path) return;
 
+  var params = getParams(path);
+
+  // Remove query string parameters
+  if (path.indexOf('?') > -1) path = path.substring(0, path.indexOf('?'));
+
   // Update the page index so we can track which direction we are going
   var index = Router._getIndex();
   if (replaceState) {
     if (index < 1) index = 1;
-    path = FlowRouter.path(path, null, {i: index});
+    path = FlowRouter.path(path, null, _.extend(params, {i: index}));
     FlowRouter.redirect(path);
   } else {
     // Increment the page index
-    FlowRouter.go(path, null, {i: index + 1});
+    FlowRouter.go(path, null, _.extend(params, {i: index + 1}));
   }
 };
 
