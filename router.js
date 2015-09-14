@@ -7,7 +7,7 @@ Router._emitter = new EventEmitter();
 Router.on = Router._emitter.on.bind(Router._emitter);
 Router.once = Router._emitter.once.bind(Router._emitter);
 
-var allowAction = true;
+var skipNextAction = true;
 
 var currentRouteVar = new ReactiveVar();
 var previousRouteVar = new ReactiveVar();
@@ -86,7 +86,7 @@ Router._getIndex = function (params) {
  * We store the page index in the query parameters because that
  * is the only way we can support the browser's back button.
  */
-Router.go = function (path, replaceState, noAction) {
+Router.go = function (path, replaceState, skipAction) {
   if (!Router._enabled || window.location.pathname === path) return;
 
   var params = getParams(path);
@@ -94,7 +94,7 @@ Router.go = function (path, replaceState, noAction) {
   // Remove query string parameters
   if (path.indexOf('?') > -1) path = path.substring(0, path.indexOf('?'));
 
-  allowAction = !noAction;
+  skipNextAction = !!skipAction;
 
   // Update the page index so we can track which direction we are going
   var index = Router._getIndex();
@@ -182,7 +182,7 @@ Router.map = function (routeActions) {
   _.each(routeActions, function (action, route) {
     FlowRouter.route(route, {
       action: function (params) {
-        if (allowAction) debouncedRouteAction(route, action, params);
+        if (!skipNextAction) debouncedRouteAction(route, action, params);
       }
     });
   });

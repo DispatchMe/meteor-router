@@ -47,7 +47,7 @@ describe('Router', function () {
     Router.go('/route_1');
   });
 
-  it('does not perform route action with Router.go and noAction flag', function (done) {
+  it('does not perform route action with Router.go and skipAction flag', function (done) {
     Router.map({
       '/route': function () {
         fail();
