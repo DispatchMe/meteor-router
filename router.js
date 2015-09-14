@@ -26,7 +26,7 @@ var getParams = function (str) {
    if (queryString.length) {
       keyValPairs = queryString.split('&');
 
-      for (pairNum in keyValPairs) {
+      for (var pairNum in keyValPairs) {
         var key = keyValPairs[pairNum].split('=')[0];
         if (!key.length) continue;
         if (typeof params[key] === 'undefined')
