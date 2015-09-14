@@ -29,3 +29,16 @@ Package.onUse(function (api) {
 
   api.export('Router', 'web');
 });
+
+Package.onTest(function (api) {
+  api.use('sanjo:jasmine@0.18.0');
+
+  api.use([
+    'meteorhacks:flow-router@1.15.0',
+    'dispatch:router'
+  ], 'web');
+
+  api.addFiles([
+    'router_tests.js'
+  ], 'web');
+});

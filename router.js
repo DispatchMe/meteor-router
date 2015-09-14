@@ -7,6 +7,8 @@ Router._emitter = new EventEmitter();
 Router.on = Router._emitter.on.bind(Router._emitter);
 Router.once = Router._emitter.once.bind(Router._emitter);
 
+var allowAction = true;
+
 var currentRouteVar = new ReactiveVar();
 var previousRouteVar = new ReactiveVar();
 
@@ -84,7 +86,7 @@ Router._getIndex = function (params) {
  * We store the page index in the query parameters because that
  * is the only way we can support the browser's back button.
  */
-Router.go = function (path, replaceState) {
+Router.go = function (path, replaceState, noAction) {
   if (!Router._enabled || window.location.pathname === path) return;
 
   var params = getParams(path);
@@ -92,15 +94,17 @@ Router.go = function (path, replaceState) {
   // Remove query string parameters
   if (path.indexOf('?') > -1) path = path.substring(0, path.indexOf('?'));
 
+  allowAction = !noAction;
+
   // Update the page index so we can track which direction we are going
   var index = Router._getIndex();
   if (replaceState) {
     if (index < 1) index = 1;
-    path = FlowRouter.path(path, null, _.extend(params, {i: index}));
+    path = FlowRouter.path(path, null, _.extend(params, {i: index }));
     FlowRouter.redirect(path);
   } else {
     // Increment the page index
-    FlowRouter.go(path, null, _.extend(params, {i: index + 1}));
+    FlowRouter.go(path, null, _.extend(params, {i: index + 1 }));
   }
 };
 
@@ -120,7 +124,7 @@ var forceBack = false;
  * Replace the current route and animate backwards.
  * @param [path] Defaults to going to the previous route in history.
  */
-Router.goBack = function (path) {
+Router.goBack = function (path, noAction) {
   if (!Router._enabled) return;
 
   history.back();
@@ -131,7 +135,7 @@ Router.goBack = function (path) {
   // Since route actions are debounced only the new route will be triggered.
   Meteor.setTimeout(function () {
     forceBack = true;
-    Router.go(path, true);
+    Router.go(path, true, noAction);
   }, 10);
 };
 
@@ -178,7 +182,7 @@ Router.map = function (routeActions) {
   _.each(routeActions, function (action, route) {
     FlowRouter.route(route, {
       action: function (params) {
-        debouncedRouteAction(route, action, params);
+        if (allowAction) debouncedRouteAction(route, action, params);
       }
     });
   });
