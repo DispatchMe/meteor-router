@@ -1,4 +1,4 @@
-Router
+Router [![Build Status](https://travis-ci.org/DispatchMe/meteor-router.svg?branch=master)](https://travis-ci.org/DispatchMe/meteor-router)
 ======
 
 ##Usage
