@@ -2,7 +2,7 @@ Package.describe({
   name: 'dispatch:router',
   summary: 'A lightweight wrapper around FlowRouter to emit events and track direction.',
   git: 'https://github.com/DispatchMe/meteor-router.git',
-  version: '0.0.8'
+  version: '1.0.0'
 });
 
 Package.onUse(function (api) {
