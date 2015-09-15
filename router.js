@@ -7,7 +7,7 @@ Router._emitter = new EventEmitter();
 Router.on = Router._emitter.on.bind(Router._emitter);
 Router.once = Router._emitter.once.bind(Router._emitter);
 
-var skipNextAction = true;
+var skipNextAction = false;
 
 var currentRouteVar = new ReactiveVar();
 var previousRouteVar = new ReactiveVar();
